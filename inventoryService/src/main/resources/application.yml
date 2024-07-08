@@ -15,7 +15,7 @@ spring:
     name: inventory-service
 
 server:
-  port: 0
+  port: 8083
 
 eureka:
   client:
