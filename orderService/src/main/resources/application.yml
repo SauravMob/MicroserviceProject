@@ -13,6 +13,19 @@ spring:
       ddl-auto: update
   application:
     name: order-service
+  kafka:
+    bootstrap-servers: localhost:9092
+    template:
+      default-topic: notificationTopic
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        spring:
+          json:
+            type:
+              mapping: event:com.microservices.orderService.event.OrderPlacedEvent
+
 
 server:
   port: 8082
@@ -33,6 +46,12 @@ management:
     web:
       exposure:
         include: '*'
+  zipkin:
+    tracing:
+      endpoint: http://localhost:9411/api/v2/spans
+  tracing:
+    sampling:
+      probability: 1.0
 
 resilience4j:
   circuitbreaker:
@@ -46,11 +65,12 @@ resilience4j:
         waitDurationInOpenState: 5s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
-    timelimiter:
-      instances:
-        inventory:
-          timeout-duration: 3s
-    retry:
-      instances:
-        inventory:
-          wait-duration: 5s
+  timelimiter:
+    instances:
+      inventory:
+        timeout-duration: 3s
+  retry:
+    instances:
+      inventory:
+        wait-duration: 5s
+        max-attempts: 3
